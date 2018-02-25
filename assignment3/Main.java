@@ -29,8 +29,11 @@ public class Main {
 		}
 		initialize();
 
-		graph.printWordGraph();
-		// TODO methods to read in words, output ladder
+		while(true){
+			ArrayList<String> words = parse(kb);
+			if(words.size() == 0)
+				break;
+		}
 	}
 	
 	public static void initialize() {
@@ -43,8 +46,21 @@ public class Main {
 	 * If command is /quit, return empty ArrayList. 
 	 */
 	public static ArrayList<String> parse(Scanner keyboard) {
-		// TO DO
-		return null;
+		ArrayList<String> commands = new ArrayList<>();
+		int numCmds = 0;
+
+		while(keyboard.hasNext()){
+			String nextCmd = keyboard.next();
+			if(nextCmd.equals("/quit")){
+				return new ArrayList<>();
+			} else {
+				commands.add(nextCmd);
+				numCmds++;
+			}
+			if(numCmds == 2)
+				break;
+		}
+		return commands;
 	}
 	
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
@@ -61,7 +77,13 @@ public class Main {
     
 	
 	private static void printLadder(ArrayList<String> ladder, PrintStream ps) {
-		
+		if(ladder.size() == 2){
+			ps.println("no word ladder can be found between " + ladder.get(0) + " and " + ladder.get(1) + ".");
+		} else {
+			ps.println("a " + (ladder.size() - 2) + "-rung word ladder exists between " + ladder.get(0) + " and " + ladder.get(ladder.size() - 1) + ".");
+			for(String rung : ladder)
+				ps.println(rung);
+		}
 	}
 	public static void printLadder(ArrayList<String> ladder) {
 		printLadder(ladder, System.out);
