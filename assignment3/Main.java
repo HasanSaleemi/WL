@@ -10,7 +10,7 @@
 package assignment3;
 import java.util.*;
 import java.io.*;
-
+// test lol
 public class Main {
 	
 	private static WordMap graph;
