@@ -3,10 +3,9 @@
  * Replace <...> with your actual data.
  * Hasan Saleemi
  * has2375
- * Git URL:
+ * Git URL: https://github.com/HasanSaleemi/WordLadder/
  * Fall 2018
  */
-
 
 package assignment3;
 import java.util.*;
@@ -33,6 +32,7 @@ public class Main {
 			ArrayList<String> words = parse(kb);
 			if(words.size() == 0)
 				break;
+			printLadder(getWordLadderBFS(words.get(0), words.get(1)), ps);
 		}
 	}
 	
@@ -62,19 +62,121 @@ public class Main {
 		}
 		return commands;
 	}
-	
-	public static ArrayList<String> getWordLadderDFS(String start, String end) {
-		Set<String> dict = makeDictionary();
 
-		return null;
+	private static ArrayList<String> getBestOrder(String end, ArrayList<String> choices){
+		ArrayList<String> copy = new ArrayList<>(choices);
+		ArrayList<String> order = new ArrayList<>();
+
+		while(!copy.isEmpty()){
+			int minVal = Integer.MAX_VALUE;
+			String theMin = null;
+
+			for(String check : copy){
+				int comp = 0;
+				for(int i = 0; i < end.length(); i++){
+					comp+=Math.abs((int)end.charAt(i) - (int)check.charAt(i));
+				}
+				if(comp < minVal){
+					minVal = comp;
+					theMin = check;
+				}
+			}
+			copy.remove(theMin);
+			order.add(theMin);
+		}
+
+		return order;
+	}
+	private static boolean DFS(String start, String end, ArrayList<String> visited, Map<String, String> path){
+		visited.add(start);
+		if(start.equals(end))
+			return true;
+		for(String edge : getBestOrder(end, graph.vertices.get(start))){
+			if(!visited.contains(edge)){
+				path.put(edge, start);
+				if(DFS(edge, end, visited, path))
+					return true;
+			}
+		}
+		return false;
+	}
+	public static ArrayList<String> getWordLadderDFS(String start, String end) {
+		start = start.toUpperCase(); end = end.toUpperCase();
+		ArrayList<String> finalList = new ArrayList<>();
+
+		if((graph.vertices.containsKey(start) && graph.vertices.containsKey(end)) && (start.length() == end.length())) {
+			ArrayList<String> visited = new ArrayList<>();
+			Map<String, String> path = new HashMap<>();
+
+			path.put(start, null);
+			DFS(start, end, visited, path);
+
+			while(true){
+				String connect = path.get(end);
+				if(connect != null){
+					finalList.add(0, end.toLowerCase());
+					end = connect;
+				} else {
+					break;
+				}
+			}
+			if(finalList.size() == 0)
+				finalList.add(end.toLowerCase());
+		} else {
+			finalList.add(end.toLowerCase());
+		}
+		finalList.add(0, start.toLowerCase());
+
+		return finalList;
 	}
 	
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
-		Set<String> dict = makeDictionary();
+		start = start.toUpperCase();
+		end = end.toUpperCase();
+		ArrayList<String> finalList = new ArrayList<>();
 
-		return null;
+		if ((graph.vertices.containsKey(start) && graph.vertices.containsKey(end)) && (start.length() == end.length())) {
+			Queue<String> queue = new PriorityQueue<>();
+			ArrayList<String> visited = new ArrayList<>();
+			Map<String, String> path = new HashMap<>();
+
+			path.put(start, null);
+			queue.add(start);
+
+			while (!queue.isEmpty()) {
+				String parent = queue.remove();
+
+				if (parent.equals(end))
+					break;
+
+				for (String child : graph.vertices.get(parent)) {
+					if (!visited.contains(child)){
+						if (!queue.contains(child)) {
+							path.put(child, parent);
+							queue.add(child);
+						}
+					}
+				}
+				visited.add(parent);
+			}
+			while (true) {
+				String connect = path.get(end);
+				if (connect != null) {
+					finalList.add(0, end.toLowerCase());
+					end = connect;
+				} else {
+					break;
+				}
+			}
+			if (finalList.size() == 0)
+				finalList.add(end.toLowerCase());
+		} else {
+			finalList.add(end.toLowerCase());
+		}
+		finalList.add(0, start.toLowerCase());
+
+		return finalList;
 	}
-    
 	
 	private static void printLadder(ArrayList<String> ladder, PrintStream ps) {
 		if(ladder.size() == 2){
