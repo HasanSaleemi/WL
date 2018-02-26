@@ -3,7 +3,7 @@
  * Replace <...> with your actual data.
  * Hasan Saleemi
  * has2375
- * Git URL: https://github.com/HasanSaleemi/WordLadder/
+ * Git URL: https://github.com/HasanSaleemi/WL/
  * Fall 2018
  */
 
@@ -13,8 +13,11 @@ import java.io.*;
 
 public class Main {
 
+	/**
+	 * All vertices of the dictionary graph.
+	 */
 	private static Map<String, ArrayList<String>> vertices;
-	
+
 	public static void main(String[] args) throws Exception {
 		Scanner kb;
 		PrintStream ps;
@@ -36,6 +39,12 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Check if a word is off by one letter from another word.
+	 * @param original The original word.
+	 * @param compare The word to compare to.
+	 * @return Boolean whether the word is off by one or not
+	 */
 	private static boolean checkOffByOne(String original, String compare){
 		if(original.length() != compare.length())
 			return false;
@@ -49,6 +58,13 @@ public class Main {
 		}
 		return diff == 1;
 	}
+
+	/**
+	 * Get an ArrayList of words from the dictionary that are one off a word.
+	 * @param dict The dictionary.
+	 * @param original The word to compare to.
+	 * @return ArrayList of words that are one off.
+	 */
 	private static ArrayList<String> getAllOffWords(Set<String> dict, String original){
 		ArrayList<String> list = new ArrayList<>();
 		for(String compare : dict){
@@ -57,6 +73,10 @@ public class Main {
 		}
 		return list;
 	}
+
+	/**
+	 * Creates the dictionary graph.
+	 */
 	public static void initialize() {
 		Set<String> dict = makeDictionary();
 		vertices = new HashMap<>();
@@ -87,6 +107,12 @@ public class Main {
 		return commands;
 	}
 
+	/**
+	 * Sorts an ArrayList of edges based on how close they are to the target word.
+	 * @param end The target word.
+	 * @param choices ArrayList of edges.
+	 * @return Sorted ArrayList.
+	 */
 	private static ArrayList<String> getBestOrder(String end, ArrayList<String> choices){
 		ArrayList<String> copy = new ArrayList<>(choices);
 		ArrayList<String> order = new ArrayList<>();
@@ -111,6 +137,14 @@ public class Main {
 
 		return order;
 	}
+	/**
+	 * Recursive Depth First Search helper function.
+	 * @param start Current parent node.
+	 * @param end Target word.
+	 * @param visited List of visited words.
+	 * @param path Path information.
+	 * @return Found the word or not.
+	 */
 	private static boolean DFS(String start, String end, ArrayList<String> visited, Map<String, String> path){
 		visited.add(start);
 		if(start.equals(end))
@@ -124,6 +158,13 @@ public class Main {
 		}
 		return false;
 	}
+	/**
+	 * Uses a smart Depth First Search algorithm to get a word ladder.
+	 * @param start Beginning word.
+	 * @param end Target word.
+	 * @return The word ladder.
+	 * If no ladder exists, will just return the start and end word in a list.
+	 */
 	public static ArrayList<String> getWordLadderDFS(String start, String end) {
 		start = start.toUpperCase(); end = end.toUpperCase();
 		ArrayList<String> finalList = new ArrayList<>();
@@ -133,7 +174,9 @@ public class Main {
 			Map<String, String> path = new HashMap<>();
 
 			path.put(start, null);
-			DFS(start, end, visited, path);
+			try{
+				DFS(start, end, visited, path);
+			} catch(StackOverflowError ignored){} // assume stack overflows mean no ladder found.
 
 			while(true){
 				String connect = path.get(end);
@@ -153,7 +196,14 @@ public class Main {
 
 		return finalList;
 	}
-	
+
+	/**
+	 * Uses a standard Breadth First Search algorithm to get a word ladder.
+	 * @param start Beginning word.
+	 * @param end Target word.
+	 * @return The word ladder.
+	 * If no ladder exists, will just return the start and end word in a list.
+	 */
     public static ArrayList<String> getWordLadderBFS(String start, String end) {
 		start = start.toUpperCase();
 		end = end.toUpperCase();
@@ -201,7 +251,12 @@ public class Main {
 
 		return finalList;
 	}
-	
+
+	/**
+	 * Prints out a word ladder.
+	 * @param ladder The ladder.
+	 * @param ps The PrintStream to output to.
+	 */
 	private static void printLadder(ArrayList<String> ladder, PrintStream ps) {
 		if(ladder.size() == 2){
 			ps.println("no word ladder can be found between " + ladder.get(0) + " and " + ladder.get(1) + ".");
@@ -211,6 +266,10 @@ public class Main {
 				ps.println(rung);
 		}
 	}
+	/**
+	 * Prints out a word ladder to System.out.
+	 * @param ladder The ladder.
+	 */
 	public static void printLadder(ArrayList<String> ladder) {
 		printLadder(ladder, System.out);
 	}
