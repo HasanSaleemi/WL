@@ -10,10 +10,10 @@
 package assignment3;
 import java.util.*;
 import java.io.*;
-// test lol
+
 public class Main {
-	
-	private static WordMap graph;
+
+	private static Map<String, ArrayList<String>> vertices;
 	
 	public static void main(String[] args) throws Exception {
 		Scanner kb;
@@ -35,9 +35,33 @@ public class Main {
 			printLadder(getWordLadderBFS(words.get(0), words.get(1)), ps);
 		}
 	}
-	
+
+	private static boolean checkOffByOne(String original, String compare){
+		if(original.length() != compare.length())
+			return false;
+		int diff = 0;
+
+		for(int i = 0; i < original.length(); i++){
+			if(original.charAt(i) != compare.charAt(i))
+				diff++;
+			if(diff > 1)
+				return false;
+		}
+		return diff == 1;
+	}
+	private static ArrayList<String> getAllOffWords(Set<String> dict, String original){
+		ArrayList<String> list = new ArrayList<>();
+		for(String compare : dict){
+			if(checkOffByOne(original, compare))
+				list.add(compare);
+		}
+		return list;
+	}
 	public static void initialize() {
-		graph = new WordMap(makeDictionary());
+		Set<String> dict = makeDictionary();
+		vertices = new HashMap<>();
+		for(String word : dict)
+			vertices.put(word, getAllOffWords(dict, word));
 	}
 	
 	/**
@@ -91,7 +115,7 @@ public class Main {
 		visited.add(start);
 		if(start.equals(end))
 			return true;
-		for(String edge : getBestOrder(end, graph.vertices.get(start))){
+		for(String edge : getBestOrder(end, vertices.get(start))){
 			if(!visited.contains(edge)){
 				path.put(edge, start);
 				if(DFS(edge, end, visited, path))
@@ -104,7 +128,7 @@ public class Main {
 		start = start.toUpperCase(); end = end.toUpperCase();
 		ArrayList<String> finalList = new ArrayList<>();
 
-		if((graph.vertices.containsKey(start) && graph.vertices.containsKey(end)) && (start.length() == end.length())) {
+		if((vertices.containsKey(start) && vertices.containsKey(end)) && (start.length() == end.length())) {
 			ArrayList<String> visited = new ArrayList<>();
 			Map<String, String> path = new HashMap<>();
 
@@ -135,7 +159,7 @@ public class Main {
 		end = end.toUpperCase();
 		ArrayList<String> finalList = new ArrayList<>();
 
-		if ((graph.vertices.containsKey(start) && graph.vertices.containsKey(end)) && (start.length() == end.length())) {
+		if ((vertices.containsKey(start) && vertices.containsKey(end)) && (start.length() == end.length())) {
 			Queue<String> queue = new PriorityQueue<>();
 			ArrayList<String> visited = new ArrayList<>();
 			Map<String, String> path = new HashMap<>();
@@ -149,7 +173,7 @@ public class Main {
 				if (parent.equals(end))
 					break;
 
-				for (String child : graph.vertices.get(parent)) {
+				for (String child : vertices.get(parent)) {
 					if (!visited.contains(child)){
 						if (!queue.contains(child)) {
 							path.put(child, parent);
