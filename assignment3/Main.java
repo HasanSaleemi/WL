@@ -30,19 +30,6 @@ public class Main {
 		}
 		initialize();
 
-		int maxVert = Integer.MIN_VALUE;
-		String max = "";
-
-		Set<String> verts = vertices.keySet();
-		for(String vert : verts){
-			if(vertices.get(vert).size() > maxVert){
-				maxVert = vertices.get(vert).size();
-				max = vert;
-			}
-		}
-
-		System.out.println(max + " " + maxVert);
-
 		while(true){
 			ArrayList<String> words = parse(kb);
 			if(words.size() == 0)
@@ -143,7 +130,7 @@ public class Main {
 						diff++;
 					comp+=Math.abs((int)end.charAt(i) - (int)check.charAt(i)); // compares all chars and gets a standardised value.
 				}
-				int combined = diff * 8 + comp * 2;
+				int combined = diff*20*check.length() + comp;//diff * 8 + comp * 2;
 				if(combined < minVal){
 					minVal = combined;
 					theMin = check;
@@ -169,9 +156,10 @@ public class Main {
 			return true;
 		for(String edge : getBestOrder(end, vertices.get(start))){
 			if(!visited.contains(edge)){
-				path.put(edge, start);
-				if(DFS(edge, end, visited, path))
+				if(DFS(edge, end, visited, path)){
+					path.put(edge, start);
 					return true;
+				}
 			}
 		}
 		return false;
