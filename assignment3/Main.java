@@ -12,7 +12,6 @@ import java.util.*;
 import java.io.*;
 
 public class Main {
-
 	/**
 	 * All vertices of the dictionary graph.
 	 */
@@ -31,11 +30,25 @@ public class Main {
 		}
 		initialize();
 
+		int maxVert = Integer.MIN_VALUE;
+		String max = "";
+
+		Set<String> verts = vertices.keySet();
+		for(String vert : verts){
+			if(vertices.get(vert).size() > maxVert){
+				maxVert = vertices.get(vert).size();
+				max = vert;
+			}
+		}
+
+		System.out.println(max + " " + maxVert);
+
 		while(true){
 			ArrayList<String> words = parse(kb);
 			if(words.size() == 0)
 				break;
 			printLadder(getWordLadderBFS(words.get(0), words.get(1)), ps);
+			printLadder(getWordLadderDFS(words.get(0), words.get(1)), ps);
 		}
 	}
 
@@ -123,11 +136,16 @@ public class Main {
 
 			for(String check : copy){
 				int comp = 0;
+				int diff = 0;
+
 				for(int i = 0; i < end.length(); i++){
-					comp+=Math.abs((int)end.charAt(i) - (int)check.charAt(i));
+					if(end.charAt(i) != check.charAt(i))
+						diff++;
+					comp+=Math.abs((int)end.charAt(i) - (int)check.charAt(i)); // compares all chars and gets a standardised value.
 				}
-				if(comp < minVal){
-					minVal = comp;
+				int combined = diff * 8 + comp * 2;
+				if(combined < minVal){
+					minVal = combined;
 					theMin = check;
 				}
 			}
@@ -210,28 +228,27 @@ public class Main {
 		ArrayList<String> finalList = new ArrayList<>();
 
 		if ((vertices.containsKey(start) && vertices.containsKey(end)) && (start.length() == end.length())) {
-			Queue<String> queue = new PriorityQueue<>();
+			Queue<String> queue = new LinkedList<>();
 			ArrayList<String> visited = new ArrayList<>();
 			Map<String, String> path = new HashMap<>();
 
+			visited.add(start);
 			path.put(start, null);
 			queue.add(start);
 
 			while (!queue.isEmpty()) {
-				String parent = queue.remove();
+				String parent = queue.poll();
 
 				if (parent.equals(end))
 					break;
 
 				for (String child : vertices.get(parent)) {
 					if (!visited.contains(child)){
-						if (!queue.contains(child)) {
-							path.put(child, parent);
-							queue.add(child);
-						}
+						visited.add(child);
+						path.put(child, parent);
+						queue.add(child);
 					}
 				}
-				visited.add(parent);
 			}
 			while (true) {
 				String connect = path.get(end);
