@@ -30,6 +30,18 @@ public class Main {
 		}
 		initialize();
 
+		/*Set<String> verts = vertices.keySet();
+		int max = -1;
+		String ss = "";
+		for(String vert: verts){
+			if(vertices.get(vert).size() >= max){
+				max = vertices.get(vert).size();
+				ss = vert;
+			}
+		}
+
+		System.out.println(ss + " " + max);*/
+
 		while(true){
 			ArrayList<String> words = parse(kb);
 			if(words.size() == 0)
@@ -110,11 +122,11 @@ public class Main {
 	/**
 	 * Sorts an ArrayList of edges based on how close they are to the target word.
 	 * @param end The target word.
-	 * @param choices ArrayList of edges.
+	 * @param start The vertex to get and set.
 	 * @return Sorted ArrayList.
 	 */
-	private static ArrayList<String> getBestOrder(String end, ArrayList<String> choices){
-		ArrayList<String> copy = new ArrayList<>(choices);
+	private static ArrayList<String> getBestOrder(String end, String start){
+		ArrayList<String> copy = new ArrayList<>(vertices.get(start));
 		ArrayList<String> order = new ArrayList<>();
 
 		while(!copy.isEmpty()){
@@ -139,8 +151,8 @@ public class Main {
 			copy.remove(theMin);
 			order.add(theMin);
 		}
-
-		return order;
+		vertices.put(start, order);
+		return vertices.get(start);
 	}
 	/**
 	 * Recursive Depth First Search helper function.
@@ -154,7 +166,7 @@ public class Main {
 		visited.add(start);
 		if(start.equals(end))
 			return true;
-		for(String edge : getBestOrder(end, vertices.get(start))){
+		for(String edge : getBestOrder(end, start)){
 			if(!visited.contains(edge)){
 				if(DFS(edge, end, visited, path)){
 					path.put(edge, start);
@@ -217,6 +229,7 @@ public class Main {
 
 		if ((vertices.containsKey(start) && vertices.containsKey(end)) && (start.length() == end.length())) {
 			Queue<String> queue = new LinkedList<>();
+			//Stack<String> stack = new Stack<>();
 			ArrayList<String> visited = new ArrayList<>();
 			Map<String, String> path = new HashMap<>();
 
@@ -237,6 +250,10 @@ public class Main {
 						queue.add(child);
 					}
 				}
+				/*stack.clear();
+				for (String child : vertices.get(parent)) {
+					stack.push(child);
+				}*/
 			}
 			while (true) {
 				String connect = path.get(end);
